@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Account | HireNest</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/auth.css">
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="container">
+      <nav class="navbar">
+
+        <div class="nav-left">
+          <a href="job-list.html">Browse Jobs</a>
+          <a href="register.html">For Recruiters</a>
+          <a href="about.html">About</a>
+          <a href="contact.html">Contact</a>
+        </div>
+
+        <a class="brand-center" href="../index.html">
+          <div class="brand-icon">
+            <img src="../assets/images/logo.png" alt="HireNest Logo">
+          </div>
+          <div class="brand-info">
+            <div class="brand-name">HireNest</div>
+            <div class="brand-tagline">Smart Recruitment Platform</div>
+          </div>
+        </a>
+
+        <div class="nav-right">
+          <a class="btn btn-ghost" href="login.html">Login</a>
+          <a class="btn btn-primary" href="register.html">Create Account</a>
+        </div>
+
+      </nav>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="auth-wrap">
+    <div class="auth-card">
+
+      <!-- LEFT INFO -->
+      <section class="auth-left">
+        <div class="auth-badge">✨ Create Account</div>
+
+        <h1 class="auth-title">
+          Join <span>HireNest</span> and start your career journey today.
+        </h1>
+
+        <p class="auth-subtitle">
+          Create your account to apply for internships and jobs, build your profile, upload your resume,
+          and track applications. Recruiters can post opportunities and manage applicants easily.
+        </p>
+
+        <div class="role-grid">
+          <div class="role-card">
+            <div class="role-top">
+              <div class="role-icon">🎓</div>
+              <div class="pill">Job Seeker</div>
+            </div>
+            <div class="role-name">Student / Fresher</div>
+            <div class="role-desc">
+              Apply to jobs, upload resume, and track application status in your dashboard.
+            </div>
+          </div>
+
+          <div class="role-card">
+            <div class="role-top">
+              <div class="role-icon">🏢</div>
+              <div class="pill">Recruiter</div>
+            </div>
+            <div class="role-name">Company / HR</div>
+            <div class="role-desc">
+              Post jobs & internships, view applicants, shortlist candidates, and manage listings.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT FORM -->
+      <section class="auth-right">
+        <div class="form-title">Create your account</div>
+        <div class="form-sub">
+          Fill the details below to register on HireNest.
+        </div>
+
+        <form class="form" id="registerForm" action="#" method="post">
+
+          <div class="two-col">
+            <div class="field">
+              <label>Full Name</label>
+              <input type="text" id="fullName" placeholder="Enter your full name" required>
+            </div>
+
+            <div class="field">
+              <label>Role</label>
+              <select id="role" required>
+                <option value="">Select role</option>
+                <option value="jobseeker">Job Seeker</option>
+                <option value="recruiter">Recruiter</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Email Address</label>
+            <input type="email" id="email" placeholder="example@gmail.com" required>
+          </div>
+
+          <div class="field">
+            <label>Mobile Number</label>
+            <input type="tel" id="mobile" placeholder="Enter 10-digit mobile number" maxlength="10"
+              pattern="[6-9]{1}[0-9]{9}" required>
+          </div>
+
+          <div class="field">
+            <label>Password</label>
+            <div class="password-wrapper">
+              <input type="password" id="password" required>
+              <span class="toggle-password" data-target="password">👁️</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Confirm Password</label>
+            <div class="password-wrapper">
+              <input type="password" id="confirmPassword" required>
+              <span class="toggle-password" data-target="confirmPassword">👁️</span>
+            </div>
+          </div>
+
+          <p class="helper">
+            📌 Note: In future, Django backend will handle secure authentication and database storage.
+          </p>
+
+          <!-- Error Message -->
+          <p class="form-error" id="formError"></p>
+
+          <div class="form-actions">
+            <button class="btn btn-primary btn-full" type="submit">Create Account</button>
+          </div>
+
+          <div class="bottom-text">
+            Already have an account? <a href="login.html">Login</a>
+          </div>
+
+        </form>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- External JS -->
+  <script src="../assets/js/auth.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,210 @@
+/* ===== Auth Pages CSS (Register / Login) ===== */
+
+.auth-wrap{
+  padding: 50px 0;
+  min-height: calc(100vh - 90px);
+  display: grid;
+  place-items: center;
+}
+
+/* ===============================
+   BIG GLASS AUTH CONTAINER
+================================ */
+
+.auth-wrap .auth-card{
+  width: 100%;
+  max-width: 880px;                 /* 🔥 FIXED WIDTH */
+  margin: 32px auto;                /* 🔥 VISIBLE MARGIN */
+  padding: 18px;
+  border-radius: 22px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.10);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.55);
+  overflow: hidden;
+}
+
+/* ===============================
+   LOGIN LAYOUT (LEFT ↔ RIGHT)
+================================ */
+
+.login-box{
+  display: flex;
+  gap: 40px;
+  width: 100%;
+}
+
+/* ===============================
+   LEFT SIDE – SUCCESS MESSAGE
+================================ */
+
+.login-success{
+  flex: 1;
+  max-width: 420px;
+  padding: 28px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #16A34A, #22C55E);
+  color: #ffffff;
+
+  opacity: 0;
+  transform: translateX(-40px);
+  transition:
+    opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.login-success h2{
+  font-size: 26px;
+  font-weight: 900;
+}
+
+.login-success p{
+  margin-top: 10px;
+  line-height: 1.6;
+  opacity: 0.95;
+}
+
+/* Hide success panel initially */
+.login-box:not(.success) .login-success{
+  display: none;
+}
+
+/* Show success panel after login */
+.login-box.success .login-success{
+  display: block;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ===============================
+   RIGHT SIDE – LOGIN FORM
+================================ */
+
+.login-form{
+  width: 420px;
+  transition:
+    opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===============================
+   FORM STYLES
+================================ */
+
+.auth-badge{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.88);
+  width: fit-content;
+}
+
+.auth-subtitle{
+  margin-top: 6px;
+  font-size: 14px;
+  color: rgba(255,255,255,0.70);
+  line-height: 1.6;
+}
+
+.form{
+  margin-top: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.field{
+  display: grid;
+  gap: 8px;
+}
+
+.field label{
+  font-size: 12.5px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.70);
+}
+
+.field input{
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.92);
+  font-size: 14px;
+  outline: none;
+}
+
+.field input::placeholder{
+  color: rgba(255,255,255,0.40);
+}
+
+.field input:focus{
+  border-color: rgba(79,140,255,0.55);
+  box-shadow: 0 0 0 4px rgba(79,140,255,0.12);
+}
+
+.btn-full{
+  width: 100%;
+}
+
+/* ===============================
+   FORM ERROR
+================================ */
+
+.form-error{
+  display: none;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(239,68,68,0.15);
+  border: 1px solid rgba(239,68,68,0.4);
+  color: #FCA5A5;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ===============================
+   PASSWORD EYE
+================================ */
+
+.password-wrapper{
+  position: relative;
+}
+
+.password-wrapper input{
+  padding-right: 40px;
+}
+
+.toggle-password{
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 16px;
+  color: rgba(255,255,255,0.6);
+}
+
+.toggle-password:hover{
+  color: #ffffff;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 980px){
+  .login-box{
+    flex-direction: column;
+  }
+
+  .login-success,
+  .login-form{
+    max-width: 100%;
+    width: 100%;
+  }
+}
