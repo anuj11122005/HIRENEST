@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Jobs & Internships | HireNest</title>
@@ -25,6 +26,8 @@
           <a href="post-job.html">Post a Job</a>
           <a href="about.html">About</a>
           <a href="contact.html">Contact</a>
+        <a href="my-applications.html">My Applications</a>
+
         </div>
 
         <!-- Center Logo -->
@@ -48,9 +51,11 @@
     </div>
   </header>
 
-  <!-- ================= MAIN ================= -->
-  <main class="container" style="padding: 60px 0;">
 
+  <!-- ================= MAIN ================= -->
+  <main class="container" style="padding:60px 0;">
+
+    <!-- Page Title -->
     <h1 style="font-size:32px; font-weight:900;">
       Explore Jobs & Internships
     </h1>
@@ -59,15 +64,68 @@
       Browse job and internship opportunities posted by recruiters.
     </p>
 
-    <!-- Jobs Container -->
-    <div id="jobContainer"
-         style="margin-top:30px; display:grid; gap:18px;">
+
+    <!-- ================= JOB FILTERS ================= -->
+    <div class="job-filters" style="margin-top:25px; display:flex; gap:12px; flex-wrap:wrap;">
+
+      <input
+        type="text"
+        id="searchJob"
+        placeholder="Search job title..."
+        style="padding:10px 14px; border-radius:6px; border:1px solid #444;"
+      >
+
+      <select
+        id="filterLocation"
+        style="padding:10px 14px; border-radius:6px; border:1px solid #444;"
+      >
+        <option value="">All Locations</option>
+        <option value="Ahmedabad">Ahmedabad</option>
+        <option value="Remote">Remote</option>
+        <option value="Bangalore">Bangalore</option>
+      </select>
+
+      <select
+        id="filterType"
+        style="padding:10px 14px; border-radius:6px; border:1px solid #444;"
+      >
+        <option value="">All Types</option>
+        <option value="Internship">Internship</option>
+        <option value="Full-time">Full-time</option>
+        <option value="Part-time">Part-time</option>
+      </select>
+
+    </div>
+
+
+    <!-- ================= JOB LIST ================= -->
+    <div
+      id="jobContainer"
+      style="
+      margin-top:30px;
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+      gap:20px;
+    "
+    >
+
+    </div>
+
+
+    <!-- ================= EMPTY STATE ================= -->
+    <div id="noJobsMessage" style="margin-top:40px; color:rgba(255,255,255,0.6);">
+
+      <h3>No jobs or internships posted yet.</h3>
+      <p>Recruiters will post opportunities here soon.</p>
+
     </div>
 
   </main>
+
 
   <!-- ================= JS ================= -->
   <script src="../assets/js/jobs.js"></script>
 
 </body>
+
 </html>

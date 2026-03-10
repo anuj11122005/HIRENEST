@@ -1,94 +1,92 @@
-// =======================================================
-// HireNest - Jobs Handling (Frontend using localStorage)
-// =======================================================
+const jobContainer = document.getElementById("jobContainer");
+const searchInput = document.getElementById("searchJob");
+const locationFilter = document.getElementById("filterLocation");
+const typeFilter = document.getElementById("filterType");
+const noJobsMessage = document.getElementById("noJobsMessage");
 
-document.addEventListener("DOMContentLoaded", function () {
+let jobs = [];
 
-  const postJobForm = document.getElementById("postJobForm");
-  const jobContainer = document.getElementById("jobContainer");
+async function loadJobs() {
 
-  // ---------------------------------------
-  // POST JOB PAGE LOGIC
-  // ---------------------------------------
-  if (postJobForm) {
+    const response = await fetch("../data/jobs.json");
+    jobs = await response.json();
 
-    postJobForm.addEventListener("submit", function (e) {
-      e.preventDefault();
+    displayJobs(jobs);
+}
 
-      const jobTitle = document.getElementById("jobTitle").value.trim();
-      const companyName = document.getElementById("companyName").value.trim();
-      const jobType = document.getElementById("jobType").value;
-      const location = document.getElementById("location").value.trim();
-      const description = document.getElementById("description").value.trim();
+function displayJobs(jobList) {
 
-      // Basic validation
-      if (
-        jobTitle === "" ||
-        companyName === "" ||
-        jobType === "" ||
-        location === "" ||
-        description === ""
-      ) {
-        alert("Please fill all fields");
+    jobContainer.innerHTML = "";
+
+    if (jobList.length === 0) {
+        noJobsMessage.style.display = "block";
         return;
-      }
-
-      // Job object
-      const job = {
-        id: Date.now(), // unique id
-        title: jobTitle,
-        company: companyName,
-        type: jobType,
-        location: location,
-        description: description
-      };
-
-      // Get existing jobs or create new array
-      const jobs = JSON.parse(localStorage.getItem("hireNestJobs")) || [];
-
-      // Add new job
-      jobs.push(job);
-
-      // Save back to localStorage
-      localStorage.setItem("hireNestJobs", JSON.stringify(jobs));
-
-      alert("Job posted successfully!");
-      postJobForm.reset();
-    });
-  }
-
-  // ---------------------------------------
-  // JOB LIST PAGE LOGIC
-  // ---------------------------------------
-  if (jobContainer) {
-
-    const jobs = JSON.parse(localStorage.getItem("hireNestJobs")) || [];
-
-    // No jobs case
-    if (jobs.length === 0) {
-      jobContainer.innerHTML =
-        "<p style='color:rgba(255,255,255,0.7);'>No jobs or internships posted yet.</p>";
-      return;
     }
 
-    // Render each job
-    jobs.forEach(function (job) {
+    noJobsMessage.style.display = "none";
 
-      const jobCard = document.createElement("div");
-      jobCard.className = "card";
+    jobList.forEach(job => {
 
-      jobCard.innerHTML = `
-        <h3>${job.title}</h3>
-        <p><strong>Company:</strong> ${job.company}</p>
-        <p><strong>Location:</strong> ${job.location}</p>
-        <p><strong>Type:</strong> ${job.type}</p>
-        <p style="margin-top:6px; color:rgba(255,255,255,0.75);">
-          ${job.description}
-        </p>
-      `;
+        const jobCard = document.createElement("div");
+        jobCard.classList.add("job-card");
 
-      jobContainer.appendChild(jobCard);
+        jobCard.innerHTML = `
+            <h3>${job.title}</h3>
+            <p><strong>${job.company}</strong> • ${job.location}</p>
+            <p>${job.type}</p>
+            <p style="color:#9ca3af">${job.skills || job.description || ""}</p>
+
+            <button class="apply-btn" style="margin-top:10px;">
+                Apply
+            </button>
+        `;
+
+        const applyButton = jobCard.querySelector(".apply-btn");
+
+        applyButton.addEventListener("click", function () {
+
+            let applications =
+                JSON.parse(localStorage.getItem("applications")) || [];
+
+            applications.push(job);
+
+            localStorage.setItem(
+                "applications",
+                JSON.stringify(applications)
+            );
+
+            alert("Application submitted successfully!");
+        });
+
+        jobContainer.appendChild(jobCard);
     });
-  }
+}
 
-});
+function filterJobs() {
+
+    const searchValue = searchInput.value.toLowerCase();
+    const locationValue = locationFilter.value;
+    const typeValue = typeFilter.value;
+
+    const filteredJobs = jobs.filter(job => {
+
+        const matchTitle =
+            job.title.toLowerCase().includes(searchValue);
+
+        const matchLocation =
+            locationValue === "" || job.location === locationValue;
+
+        const matchType =
+            typeValue === "" || job.type === typeValue;
+
+        return matchTitle && matchLocation && matchType;
+    });
+
+    displayJobs(filteredJobs);
+}
+
+searchInput.addEventListener("input", filterJobs);
+locationFilter.addEventListener("change", filterJobs);
+typeFilter.addEventListener("change", filterJobs);
+
+loadJobs();

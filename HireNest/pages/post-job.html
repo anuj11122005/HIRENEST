@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -48,7 +49,7 @@
   </header>
 
   <!-- ================= MAIN ================= -->
-  <main class="container" style="padding: 60px 0;">
+  <main class="container" style="padding:60px 0;">
 
     <h1 style="font-size:32px; font-weight:900;">
       Post a Job / Internship
@@ -104,7 +105,38 @@
   </main>
 
   <!-- ================= JS ================= -->
-  <script src="../assets/js/jobs.js"></script>
+  <script>
+
+  const form = document.getElementById("postJobForm");
+
+  form.addEventListener("submit", function(e){
+
+      e.preventDefault();
+
+      const job = {
+          title: document.getElementById("jobTitle").value,
+          company: document.getElementById("companyName").value,
+          type: document.getElementById("jobType").value,
+          location: document.getElementById("location").value,
+          description: document.getElementById("description").value
+      };
+
+      let jobs = JSON.parse(localStorage.getItem("jobs")) || [];
+
+      jobs.push(job);
+
+      localStorage.setItem("jobs", JSON.stringify(jobs));
+
+      alert("Job posted successfully!");
+
+      form.reset();
+
+      window.location.href = "job-list.html";
+
+  });
+
+  </script>
 
 </body>
 </html>
+```

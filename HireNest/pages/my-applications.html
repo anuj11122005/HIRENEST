@@ -1,40 +1,97 @@
-<!-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <title>My Applications | HireNest</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="../assets/css/style.css">
+<meta charset="UTF-8">
+<title>My Applications | HireNest</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="../assets/css/style.css">
 </head>
+
 <body>
 
 <header class="site-header">
-  <div class="container">
-    <nav class="navbar">
-      <div class="nav-left">
-        <a href="jobseeker-dashboard.html">Dashboard</a>
-      </div>
+<div class="container">
+<nav class="navbar">
 
-      <div class="nav-center">
-        <a class="brand-center" href="../index.html">
-          <img src="../assets/images/logo.png">
-          <div class="brand-text">
-            <strong>HireNest</strong>
-            <span>Applications</span>
-          </div>
-        </a>
-      </div>
-    </nav>
-  </div>
+<div class="nav-left">
+<a href="job-list.html">Browse Jobs</a>
+<a href="../index.html">Home</a>
+</div>
+
+<div class="nav-center">
+<a class="brand-center" href="../index.html">
+<img src="../assets/images/logo.png">
+<div class="brand-text">
+<strong>HireNest</strong>
+<span>Smart Recruitment Platform</span>
+</div>
+</a>
+</div>
+
+<div class="nav-right">
+<a class="btn btn-ghost" href="login.html">Login</a>
+</div>
+
+</nav>
+</div>
 </header>
 
-<main class="container" style="padding:60px 0;">
-  <h1>My Applications</h1>
 
-  <div class="card" style="margin-top:20px;">
-    Frontend Developer Intern – <strong>Applied</strong>
-  </div>
+<main class="container" style="padding:60px 0;">
+
+<h1 style="font-size:32px;font-weight:900;">
+My Applications
+</h1>
+
+<p style="margin-top:8px;color:rgba(255,255,255,0.7);">
+Track the jobs and internships you have applied for.
+</p>
+
+<div id="applicationsContainer"
+style="margin-top:30px;display:grid;gap:18px;">
+</div>
+
 </main>
 
+
+<script>
+
+const container =
+document.getElementById("applicationsContainer");
+
+const applications =
+JSON.parse(localStorage.getItem("applications")) || [];
+
+if(applications.length === 0){
+
+container.innerHTML =
+"<p>No applications submitted yet.</p>";
+
+}else{
+
+applications.forEach(job => {
+
+const card =
+document.createElement("div");
+
+card.classList.add("job-card");
+
+card.innerHTML = `
+<h3>${job.title}</h3>
+<p><strong>${job.company}</strong> • ${job.location}</p>
+<p>${job.type}</p>
+<p>Status: Applied</p>
+`;
+
+container.appendChild(card);
+
+});
+
+}
+
+</script>
+
 </body>
-</html> -->
+</html>
