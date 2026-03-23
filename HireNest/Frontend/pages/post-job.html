@@ -107,35 +107,43 @@
   <!-- ================= JS ================= -->
   <script>
 
-  const form = document.getElementById("postJobForm");
+document.getElementById("postJobForm").addEventListener("submit", async function(e){
 
-  form.addEventListener("submit", function(e){
+    e.preventDefault();
 
-      e.preventDefault();
+    const jobData = {
+        title: document.getElementById("jobTitle").value,
+        company: document.getElementById("companyName").value,
+        job_type: document.getElementById("jobType").value,
+        location: document.getElementById("location").value,
+        description: document.getElementById("description").value
+    };
 
-      const job = {
-          title: document.getElementById("jobTitle").value,
-          company: document.getElementById("companyName").value,
-          type: document.getElementById("jobType").value,
-          location: document.getElementById("location").value,
-          description: document.getElementById("description").value
-      };
+    try {
 
-      let jobs = JSON.parse(localStorage.getItem("jobs")) || [];
+        const response = await fetch("http://127.0.0.1:8000/api/jobs/create/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(jobData)
+        });
 
-      jobs.push(job);
+        const data = await response.json();
 
-      localStorage.setItem("jobs", JSON.stringify(jobs));
+        alert("Job posted successfully!");
 
-      alert("Job posted successfully!");
+        window.location.href = "job-list.html";
 
-      form.reset();
+    } catch(error) {
 
-      window.location.href = "job-list.html";
+        console.error("Error posting job:", error);
+        alert("Something went wrong!");
 
-  });
+    }
 
-  </script>
+});
+</script>
 
 </body>
 </html>

@@ -8,7 +8,7 @@ let jobs = [];
 
 async function loadJobs() {
 
-    const response = await fetch("../data/jobs.json");
+    const response = await fetch("http://127.0.0.1:8000/api/jobs/");
     jobs = await response.json();
 
     displayJobs(jobs);
@@ -33,8 +33,8 @@ function displayJobs(jobList) {
         jobCard.innerHTML = `
             <h3>${job.title}</h3>
             <p><strong>${job.company}</strong> • ${job.location}</p>
-            <p>${job.type}</p>
-            <p style="color:#9ca3af">${job.skills || job.description || ""}</p>
+            <p>${job.job_type}</p>
+            <p style="color:#9ca3af">${job.description || ""}</p>
 
             <button class="apply-btn" style="margin-top:10px;">
                 Apply
@@ -43,19 +43,45 @@ function displayJobs(jobList) {
 
         const applyButton = jobCard.querySelector(".apply-btn");
 
-        applyButton.addEventListener("click", function () {
+        applyButton.addEventListener("click", async function () {
 
-            let applications =
-                JSON.parse(localStorage.getItem("applications")) || [];
+            const name = prompt("Enter your name:");
+            const email = prompt("Enter your email:");
 
-            applications.push(job);
+            if (!name || !email) {
+                alert("Name and email are required.");
+                return;
+            }
 
-            localStorage.setItem(
-                "applications",
-                JSON.stringify(applications)
-            );
+            try {
 
-            alert("Application submitted successfully!");
+                const response = await fetch("http://127.0.0.1:8000/api/apply/", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        job_id: job.id,
+                        name: name,
+                        email: email
+                    })
+
+                });
+
+                const result = await response.json();
+
+                alert("Application submitted successfully!");
+
+            } catch (error) {
+
+                console.error("Error applying:", error);
+                alert("Something went wrong.");
+
+            }
+
         });
 
         jobContainer.appendChild(jobCard);
@@ -77,7 +103,7 @@ function filterJobs() {
             locationValue === "" || job.location === locationValue;
 
         const matchType =
-            typeValue === "" || job.type === typeValue;
+            typeValue === "" || job.job_type === typeValue;
 
         return matchTitle && matchLocation && matchType;
     });
