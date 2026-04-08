@@ -66,34 +66,56 @@
 
 
     <!-- ================= JOB FILTERS ================= -->
-    <div class="job-filters" style="margin-top:25px; display:flex; gap:12px; flex-wrap:wrap;">
+    <div class="job-filters" style="margin-top:25px; display:grid; gap:12px;">
 
+      <!-- Search Bar -->
       <input
         type="text"
         id="searchJob"
-        placeholder="Search job title..."
-        style="padding:10px 14px; border-radius:6px; border:1px solid #444;"
+        placeholder="Search by job title, company, or skills..."
+        style="padding:12px 16px; border-radius:8px; border:1px solid #444; background:#1f2937; color:white; font-size:15px;"
       >
 
-      <select
-        id="filterLocation"
-        style="padding:10px 14px; border-radius:6px; border:1px solid #444;"
-      >
-        <option value="">All Locations</option>
-        <option value="Ahmedabad">Ahmedabad</option>
-        <option value="Remote">Remote</option>
-        <option value="Bangalore">Bangalore</option>
-      </select>
+      <!-- Filter Row -->
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
 
-      <select
-        id="filterType"
-        style="padding:10px 14px; border-radius:6px; border:1px solid #444;"
-      >
-        <option value="">All Types</option>
-        <option value="Internship">Internship</option>
-        <option value="Full-time">Full-time</option>
-        <option value="Part-time">Part-time</option>
-      </select>
+        <select
+          id="filterLocation"
+          style="padding:10px 14px; border-radius:6px; border:1px solid #444; background:#1f2937; color:white; min-width:150px;"
+        >
+          <option value="">All Locations</option>
+          <option value="Remote">Remote</option>
+          <option value="Ahmedabad">Ahmedabad</option>
+          <option value="Bangalore">Bangalore</option>
+          <option value="Mumbai">Mumbai</option>
+          <option value="Delhi">Delhi</option>
+          <option value="Pune">Pune</option>
+          <option value="Hyderabad">Hyderabad</option>
+        </select>
+
+        <select
+          id="filterType"
+          style="padding:10px 14px; border-radius:6px; border:1px solid #444; background:#1f2937; color:white; min-width:150px;"
+        >
+          <option value="">All Types</option>
+          <option value="Internship">Internship</option>
+          <option value="Full-time">Full-time</option>
+          <option value="Part-time">Part-time</option>
+          <option value="Contract">Contract</option>
+        </select>
+
+        <select
+          id="sortFilter"
+          style="padding:10px 14px; border-radius:6px; border:1px solid #444; background:#1f2937; color:white; min-width:150px;"
+        >
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+        </select>
+
+      </div>
+
+      <!-- Jobs Count -->
+      <p id="jobsCount" style="color:rgba(255,255,255,0.7); margin-top:8px;">Loading...</p>
 
     </div>
 
@@ -120,11 +142,45 @@
 
     </div>
 
+    <!-- ================= PAGINATION ================= -->
+    <div id="paginationContainer" style="margin-top:30px; display:flex; justify-content:center; gap:8px; align-items:center;">
+      <!-- Pagination buttons will be inserted here -->
+    </div>
+
   </main>
+
+  <style>
+    .page-btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: 1px solid #444;
+      background: #1f2937;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .page-btn:hover {
+      background: #7C5CFF;
+      border-color: #7C5CFF;
+    }
+    .page-btn.active {
+      background: #7C5CFF;
+      border-color: #7C5CFF;
+    }
+    .page-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  </style>
 
 
   <!-- ================= JS ================= -->
+  <script src="../assets/js/auth-guard.js"></script>
   <script src="../assets/js/jobs.js"></script>
+  <script>
+    // Update navbar on load
+    updateNavbar();
+  </script>
 
 </body>
 

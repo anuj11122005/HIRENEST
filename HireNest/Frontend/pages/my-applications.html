@@ -34,7 +34,7 @@
 </div>
 
 <div class="nav-right">
-<a class="btn btn-ghost" href="login.html">Login</a>
+<!-- Will be updated by auth-guard -->
 </div>
 
 </nav>
@@ -54,45 +54,71 @@ Track the jobs and internships you have applied for.
 
 <div id="applicationsContainer"
 style="margin-top:30px;display:grid;gap:18px;">
+<div style="color:rgba(255,255,255,0.7);">Loading applications...</div>
 </div>
 
 </main>
 
-
+<script src="../assets/js/auth-guard.js"></script>
 <script>
 
-const container =
-document.getElementById("applicationsContainer");
+const container = document.getElementById("applicationsContainer");
 
-const applications =
-JSON.parse(localStorage.getItem("applications")) || [];
+async function loadApplications() {
+  // Check authentication first
+  const isAuthenticated = await requireAuth();
+  if (!isAuthenticated) {
+    return;
+  }
 
-if(applications.length === 0){
+  // Update navbar
+  updateNavbar();
 
-container.innerHTML =
-"<p>No applications submitted yet.</p>";
+  try {
+    const response = await fetch("http://127.0.0.1:8000/api/applications/", {
+      credentials: "include"
+    });
 
-}else{
+    if (response.status === 401) {
+      container.innerHTML = "<p>Please login to view your applications.</p>";
+      return;
+    }
 
-applications.forEach(job => {
+    const applications = await response.json();
 
-const card =
-document.createElement("div");
+    if (applications.length === 0) {
+      container.innerHTML = "<p>No applications submitted yet.</p>";
+      return;
+    }
 
-card.classList.add("job-card");
+    container.innerHTML = "";
 
-card.innerHTML = `
-<h3>${job.title}</h3>
-<p><strong>${job.company}</strong> • ${job.location}</p>
-<p>${job.type}</p>
-<p>Status: Applied</p>
-`;
+    applications.forEach(app => {
+      const card = document.createElement("div");
+      card.classList.add("job-card");
 
-container.appendChild(card);
+      const appliedDate = new Date(app.applied_at).toLocaleDateString();
 
-});
+      card.innerHTML = `
+        <h3>${app.job__title || app.job_title}</h3>
+        <p><strong>${app.job__company || app.job_company}</strong> • ${app.job__location || app.job_location || "N/A"}</p>
+        <p>${app.job__job_type || app.job_type || "N/A"}</p>
+        <p style="color:#9ca3af">Applied as: ${app.applicant_name} (${app.applicant_email})</p>
+        <p style="color:#9ca3af;font-size:14px;">Applied on: ${appliedDate}</p>
+        <p style="margin-top:10px;padding:8px 12px;background:rgba(124,92,255,0.2);border-radius:6px;display:inline-block;color:#7C5CFF;">Status: Applied</p>
+      `;
 
+      container.appendChild(card);
+    });
+
+  } catch (error) {
+    console.error("Error loading applications:", error);
+    container.innerHTML = "<p style='color:#ef4444;'>Unable to load applications. Please ensure the backend server is running.</p>";
+  }
 }
+
+// Load applications on page load
+loadApplications();
 
 </script>
 

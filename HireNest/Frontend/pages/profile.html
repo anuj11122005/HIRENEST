@@ -5,6 +5,59 @@
   <title>My Profile | HireNest</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../assets/css/style.css">
+  <style>
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 30px;
+      background: rgba(124, 92, 255, 0.1);
+      border: 1px solid #7C5CFF;
+      border-radius: 12px;
+      margin-bottom: 30px;
+    }
+    .profile-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7C5CFF, #4CAF50);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: bold;
+      color: white;
+    }
+    .profile-section {
+      background: #1f2937;
+      padding: 24px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    .profile-section h3 {
+      color: #7C5CFF;
+      margin-bottom: 16px;
+      font-size: 18px;
+    }
+    .form-grid {
+      display: grid;
+      gap: 16px;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 600px) {
+      .profile-header {
+        flex-direction: column;
+        text-align: center;
+      }
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -13,6 +66,8 @@
     <nav class="navbar">
       <div class="nav-left">
         <a href="jobseeker-dashboard.html">Dashboard</a>
+        <a href="my-applications.html">My Applications</a>
+        <a href="resume-upload.html">Resume</a>
       </div>
 
       <div class="nav-center">
@@ -20,9 +75,13 @@
           <img src="../assets/images/logo.png">
           <div class="brand-text">
             <strong>HireNest</strong>
-            <span>Profile</span>
+            <span>My Profile</span>
           </div>
         </a>
+      </div>
+
+      <div class="nav-right">
+        <!-- Updated by auth-guard -->
       </div>
     </nav>
   </div>
@@ -30,13 +89,168 @@
 
 <main class="container" style="padding:60px 0;">
   <h1>My Profile</h1>
+  <p style="color:rgba(255,255,255,0.7);margin-top:8px;">Manage your profile information and preferences</p>
 
-  <div class="card" style="margin-top:20px;">
-    <p><strong>Name:</strong> User Name</p>
-    <p><strong>Email:</strong> user@email.com</p>
-    <p><strong>Role:</strong> Job Seeker</p>
+  <div id="loadingMessage" style="margin-top:30px;color:rgba(255,255,255,0.7);">Loading profile...</div>
+
+  <div id="profileContent" style="display:none;margin-top:30px;max-width:800px;">
+
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <div class="profile-avatar" id="profileAvatar"></div>
+      <div>
+        <h2 id="profileName" style="font-size:24px;margin-bottom:4px;"></h2>
+        <p id="profileEmail" style="color:rgba(255,255,255,0.7);"></p>
+        <p id="profileRole" style="color:#7C5CFF;margin-top:6px;font-size:14px;"></p>
+      </div>
+    </div>
+
+    <!-- Personal Information -->
+    <div class="profile-section">
+      <h3>Personal Information</h3>
+      <form id="profileForm" class="form-grid">
+        <div class="form-row">
+          <div class="field">
+            <label>Full Name</label>
+            <input type="text" id="fullName" placeholder="Your full name">
+          </div>
+          <div class="field">
+            <label>Email Address</label>
+            <input type="email" id="email" placeholder="your@email.com">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Mobile Number</label>
+            <input type="tel" id="mobile" placeholder="10-digit mobile number" maxlength="10">
+          </div>
+          <div class="field">
+            <label>Role</label>
+            <select id="role">
+              <option value="job_seeker">Job Seeker</option>
+              <option value="recruiter">Recruiter</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Bio / Summary</label>
+          <textarea id="bio" rows="3" placeholder="Tell us about yourself..."></textarea>
+        </div>
+        <div class="field">
+          <label>Skills (comma separated)</label>
+          <input type="text" id="skills" placeholder="e.g. JavaScript, Python, React, Django">
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top:10px;">Save Changes</button>
+      </form>
+    </div>
+
+    <!-- Resume Section -->
+    <div class="profile-section">
+      <h3>Resume</h3>
+      <div id="resumeStatus">
+        <p style="color:rgba(255,255,255,0.7);margin-bottom:16px;">
+          Upload your resume to make it available to recruiters.
+        </p>
+        <a href="resume-upload.html" class="btn btn-primary">Upload Resume</a>
+      </div>
+    </div>
+
   </div>
 </main>
+
+<script src="../assets/js/auth-guard.js"></script>
+<script>
+const API_BASE = "http://127.0.0.1:8000/api";
+
+// Load profile on page load
+(async function() {
+  const isAuthenticated = await requireAuth();
+  if (!isAuthenticated) return;
+
+  updateNavbar();
+  loadProfile();
+})();
+
+async function loadProfile() {
+  try {
+    const response = await fetch(`${API_BASE}/profile/`, {
+      credentials: "include"
+    });
+
+    if (!response.ok) {
+      document.getElementById('loadingMessage').textContent = 'Failed to load profile';
+      return;
+    }
+
+    const data = await response.json();
+
+    // Update header
+    const fullName = data.user.full_name || data.user.username;
+    document.getElementById('profileName').textContent = fullName;
+    document.getElementById('profileEmail').textContent = data.user.email;
+    document.getElementById('profileRole').textContent = data.profile.role === 'recruiter' ? 'Recruiter' : 'Job Seeker';
+    document.getElementById('profileAvatar').textContent = fullName.charAt(0).toUpperCase();
+
+    // Update form
+    document.getElementById('fullName').value = fullName;
+    document.getElementById('email').value = data.user.email;
+    document.getElementById('mobile').value = data.profile.mobile || '';
+    document.getElementById('role').value = data.profile.role;
+    document.getElementById('bio').value = data.profile.bio || '';
+    document.getElementById('skills').value = data.profile.skills || '';
+
+    // Update resume status
+    if (data.profile.has_resume) {
+      document.getElementById('resumeStatus').innerHTML = `
+        <p style="color:#10b981;margin-bottom:16px;">Resume uploaded on ${new Date(data.profile.resume_uploaded_at).toLocaleDateString()}</p>
+        <a href="resume-upload.html" class="btn">Update Resume</a>
+      `;
+    }
+
+    document.getElementById('loadingMessage').style.display = 'none';
+    document.getElementById('profileContent').style.display = 'block';
+
+  } catch (error) {
+    console.error('Error loading profile:', error);
+    document.getElementById('loadingMessage').textContent = 'Unable to load profile. Ensure backend is running.';
+  }
+}
+
+// Handle profile update
+document.getElementById('profileForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const profileData = {
+    mobile: document.getElementById('mobile').value,
+    role: document.getElementById('role').value,
+    bio: document.getElementById('bio').value,
+    skills: document.getElementById('skills').value
+  };
+
+  try {
+    const response = await fetch(`${API_BASE}/profile/`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify(profileData)
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert('Profile updated successfully!');
+      loadProfile(); // Reload to show updated data
+    } else {
+      alert(data.error || 'Failed to update profile');
+    }
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    alert('Unable to connect to server');
+  }
+});
+</script>
 
 </body>
 </html>

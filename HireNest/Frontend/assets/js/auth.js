@@ -1,14 +1,16 @@
 // ==================================================
-// HireNest - Register Page Validation (auth.js)
+// HireNest - Register Page (Django Auth)
 // ==================================================
+
+const API_BASE = "http://127.0.0.1:8000/api";
 
 document.addEventListener("DOMContentLoaded", function () {
 
   const form = document.getElementById("registerForm");
   const errorBox = document.getElementById("formError");
 
-  form.addEventListener("submit", function (e) {
-    e.preventDefault(); // stop form submission
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
 
     // Get input values
     const fullName = document.getElementById("fullName").value.trim();
@@ -68,11 +70,39 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // ================================
-    // SUCCESS (Frontend only)
+    // REGISTER with Django Backend
     // ================================
-    alert("Account created successfully! ");
-    form.reset();
-    window.location.href = "/HireNest/index.html";
+    try {
+      const response = await fetch(`${API_BASE}/auth/register/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          username: email,  // Use email as username
+          full_name: fullName,
+          email: email,
+          role: role,
+          password: password
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Registration successful
+        localStorage.setItem("user", JSON.stringify(data.user));
+        alert("Account created successfully! Welcome to HireNest.");
+        form.reset();
+        window.location.href = "jobseeker-dashboard.html";
+      } else {
+        showError(data.error || "Registration failed");
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      showError("Unable to connect to server. Please ensure backend is running.");
+    }
   });
 
 
@@ -95,7 +125,6 @@ document.addEventListener("DOMContentLoaded", function () {
 // Show / Hide password on eye click
 document.querySelectorAll(".toggle-password").forEach(eye => {
   eye.addEventListener("click", () => {
-
     const input = document.getElementById(eye.dataset.target);
 
     if (input.type === "password") {

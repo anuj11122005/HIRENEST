@@ -1,4 +1,4 @@
-<!-- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -13,6 +13,7 @@
     <nav class="navbar">
       <div class="nav-left">
         <a href="jobseeker-dashboard.html">Dashboard</a>
+        <a href="profile.html">Profile</a>
       </div>
 
       <div class="nav-center">
@@ -24,24 +25,191 @@
           </div>
         </a>
       </div>
+
+      <div class="nav-right">
+        <!-- Updated by auth-guard -->
+      </div>
     </nav>
   </div>
 </header>
 
 <main class="container" style="padding:60px 0;">
-  <h1>Upload Resume</h1>
+  <h1>Upload Your Resume</h1>
+  <p style="color:rgba(255,255,255,0.7);max-width:500px;margin-top:10px;">
+    Upload your resume (PDF or DOC/DOCX) to make it available to recruiters.
+    You can update it anytime from your profile.
+  </p>
 
-  <form style="margin-top:20px; max-width:400px;">
-    <div class="field">
-      <label>Select Resume (PDF)</label>
-      <input type="file" required>
+  <div id="uploadSection" style="margin-top:30px;max-width:500px;">
+    <form id="uploadForm" style="display:grid;gap:16px;">
+      <div class="field">
+        <label>Select Resume File</label>
+        <input type="file" id="resumeFile" accept=".pdf,.doc,.docx" required
+               style="padding:12px;border:1px solid #444;border-radius:6px;width:100%;background:#1f2937;color:white;">
+        <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-top:6px;">
+          Allowed formats: PDF, DOC, DOCX (Max 5MB)
+        </p>
+      </div>
+
+      <div id="progressBar" style="display:none;">
+        <div style="background:#374151;border-radius:6px;overflow:hidden;">
+          <div id="progressFill" style="width:0%;height:8px;background:#7C5CFF;transition:width 0.3s;"></div>
+        </div>
+        <p style="font-size:13px;color:rgba(255,255,255,0.7);margin-top:6px;" id="progressText">Uploading...</p>
+      </div>
+
+      <p id="uploadError" class="form-error" style="display:none;"></p>
+      <p id="uploadSuccess" style="display:none;color:#10b981;"></p>
+
+      <button type="submit" class="btn btn-primary" id="uploadBtn">
+        Upload Resume
+      </button>
+    </form>
+  </div>
+
+  <div id="resumeInfo" style="margin-top:30px;max-width:500px;display:none;">
+    <div style="padding:20px;background:rgba(124,92,255,0.1);border:1px solid #7C5CFF;border-radius:10px;">
+      <h3 style="color:#7C5CFF;margin-bottom:10px;">Resume Uploaded</h3>
+      <p id="resumeFileName" style="color:rgba(255,255,255,0.9);"></p>
+      <p id="resumeUploadedAt" style="font-size:13px;color:rgba(255,255,255,0.5);margin-top:6px;"></p>
+
+      <button onclick="deleteResume()" class="btn" style="margin-top:16px;background:#ef4444;color:white;">
+        Delete Resume
+      </button>
     </div>
-
-    <button class="btn btn-primary" style="margin-top:14px;">
-      Upload Resume
-    </button>
-  </form>
+  </div>
 </main>
 
+<script src="../assets/js/auth-guard.js"></script>
+<script>
+const API_BASE = "http://127.0.0.1:8000/api";
+
+// Check authentication on load
+(async function() {
+  const isAuthenticated = await requireAuth();
+  if (!isAuthenticated) return;
+
+  updateNavbar();
+  loadProfile();
+})();
+
+// Load user profile to check if resume exists
+async function loadProfile() {
+  try {
+    const response = await fetch(`${API_BASE}/profile/`, {
+      credentials: "include"
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.profile.has_resume) {
+        document.getElementById('uploadSection').style.display = 'none';
+        document.getElementById('resumeInfo').style.display = 'block';
+        document.getElementById('resumeFileName').textContent = 'Resume on file';
+        if (data.profile.resume_uploaded_at) {
+          const date = new Date(data.profile.resume_uploaded_at).toLocaleDateString();
+          document.getElementById('resumeUploadedAt').textContent = `Uploaded on: ${date}`;
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error loading profile:', error);
+  }
+}
+
+// Handle file upload
+document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const fileInput = document.getElementById('resumeFile');
+  const file = fileInput.files[0];
+
+  if (!file) {
+    showError('Please select a file to upload');
+    return;
+  }
+
+  // Validate file size (5MB max)
+  if (file.size > 5 * 1024 * 1024) {
+    showError('File size must be less than 5MB');
+    return;
+  }
+
+  // Show progress
+  document.getElementById('progressBar').style.display = 'block';
+  document.getElementById('uploadBtn').disabled = true;
+
+  // Simulate progress
+  let progress = 0;
+  const progressInterval = setInterval(() => {
+    if (progress < 90) {
+      progress += 10;
+      document.getElementById('progressFill').style.width = progress + '%';
+    }
+  }, 200);
+
+  const formData = new FormData();
+  formData.append('resume', file);
+
+  try {
+    const response = await fetch(`${API_BASE}/profile/upload-resume/`, {
+      method: 'POST',
+      credentials: 'include',
+      body: formData
+    });
+
+    clearInterval(progressInterval);
+    document.getElementById('progressFill').style.width = '100%';
+
+    const data = await response.json();
+
+    if (response.ok) {
+      document.getElementById('progressText').textContent = 'Upload complete!';
+      document.getElementById('uploadSuccess').textContent = data.message;
+      document.getElementById('uploadSuccess').style.display = 'block';
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+    } else {
+      showError(data.error || 'Upload failed');
+      document.getElementById('progressBar').style.display = 'none';
+      document.getElementById('uploadBtn').disabled = false;
+    }
+  } catch (error) {
+    clearInterval(progressInterval);
+    showError('Unable to connect to server. Please ensure backend is running.');
+    document.getElementById('progressBar').style.display = 'none';
+    document.getElementById('uploadBtn').disabled = false;
+  }
+});
+
+function showError(message) {
+  const errorEl = document.getElementById('uploadError');
+  errorEl.textContent = message;
+  errorEl.style.display = 'block';
+}
+
+async function deleteResume() {
+  if (!confirm('Are you sure you want to delete your resume?')) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE}/profile/delete-resume/`, {
+      method: 'POST',
+      credentials: 'include'
+    });
+
+    if (response.ok) {
+      alert('Resume deleted successfully');
+      window.location.reload();
+    }
+  } catch (error) {
+    alert('Failed to delete resume');
+  }
+}
+</script>
+
 </body>
-</html> -->
+</html>
